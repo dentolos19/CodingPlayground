@@ -6,7 +6,7 @@ import hashlib # pip install hashlib
 
 SERVER_FILE = "server.jar"
 SERVER_VERSION = "1.19.2"
-ALLOCATED_MEMORY = 4096
+ALLOCATED_MEMORY = 4096 # mb
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
@@ -39,7 +39,39 @@ def main():
 
     print("Starting server...")
     print()
-    subprocess.run(["java", f"-Xms{ALLOCATED_MEMORY}M", f"-Xmx{ALLOCATED_MEMORY}M", "-jar", SERVER_FILE, "--nogui"])
+    subprocess.run([
+
+        "java",
+
+        f"-Xms{ALLOCATED_MEMORY}M",
+        f"-Xmx{ALLOCATED_MEMORY}M",
+
+        "-XX:+UseG1GC",
+        "-XX:+ParallelRefProcEnabled",
+        "-XX:MaxGCPauseMillis=200",
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+DisableExplicitGC",
+        "-XX:+AlwaysPreTouch",
+        "-XX:G1NewSizePercent=30",
+        "-XX:G1MaxNewSizePercent=40",
+        "-XX:G1HeapRegionSize=8M",
+        "-XX:G1ReservePercent=20",
+        "-XX:G1HeapWastePercent=5",
+        "-XX:G1MixedGCCountTarget=4",
+        "-XX:InitiatingHeapOccupancyPercent=15",
+        "-XX:G1MixedGCLiveThresholdPercent=90",
+        "-XX:G1RSetUpdatingPauseTimePercent=5",
+        "-XX:SurvivorRatio=32",
+        "-XX:+PerfDisableSharedMem",
+        "-XX:MaxTenuringThreshold=1",
+        "-Dusing.aikars.flags=https://mcflags.emc.gs",
+        "-Daikars.new.flags=true"
+
+        "-jar",
+        SERVER_FILE,
+        "--nogui"
+
+    ])
 
     exit(0)
 
